@@ -1,5 +1,10 @@
 package com.devShahriar.trackMe;
 
+import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 
@@ -10,14 +15,18 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,8 +35,14 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int REQUEST_CODE_LOCATION_PERMISSION=1;
+
     private WebSocket webSocket;
     private String SERVER_PATH = "ws://10.160.52.70:80/ws/sdf";
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +57,29 @@ public class MainActivity extends AppCompatActivity {
             Log.d("ws :", String.valueOf(e) );
         }
 
+        findViewById(R.id.startService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ContextCompat.checkSelfPermission(
+                        getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(
+                            MainActivity.this,
+                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            REQUEST_CODE_LOCATION_PERMISSION
+                    );
+                }else{
+                    startLocationService();
+                }
+
+            }
+        });
+        findViewById(R.id.stopService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopLocationService();
+            }
+        });
+
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,6 +89,52 @@ public class MainActivity extends AppCompatActivity {
                 webSocket.send("jsonObject.toString()");
             }
         });
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == REQUEST_CODE_LOCATION_PERMISSION){
+            if(grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                startLocationService();
+            }
+            else{
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private boolean isLocationServiceRunning() {
+        ActivityManager activityManager =
+                (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        if(activityManager!=null){
+            for(ActivityManager.RunningServiceInfo service:
+            activityManager.getRunningServices(Integer.MAX_VALUE)){
+                if(LocationService.class.getName().equals(service.service.getClassName())){
+                    if(service.foreground){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
+    private void startLocationService() {
+        if(!isLocationServiceRunning()){
+            Intent intent = new Intent(getApplicationContext(),LocationService.class);
+            intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+            startService(intent);
+            Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void stopLocationService() {
+        if(isLocationServiceRunning()){
+            Intent intent = new Intent(getApplicationContext(),LocationService.class);
+            intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+            startService(intent);
+            Toast.makeText(this, "Location service stopped", Toast.LENGTH_SHORT).show();
+
+        }
     }
 
     private void initiatWebsocket() {
@@ -88,25 +172,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
-        return super.onOptionsItemSelected(item);
-    }
 }

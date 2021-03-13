@@ -87,6 +87,7 @@ public class LocationService extends Service {
                         NotificationManager.IMPORTANCE_HIGH
                 );
                 notificationChannel.setDescription("Channel used for realtime locaiton traking ");
+                notificationManager.createNotificationChannel(notificationChannel);
             }
         }
 
@@ -95,13 +96,12 @@ public class LocationService extends Service {
         locationRequest.setFastestInterval(2000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-        }
 
 
         LocationServices.getFusedLocationProviderClient(this)
                 .requestLocationUpdates(locationRequest,locationCallback,Looper.getMainLooper());
+
+
         startForeground(Constants.LOCATION_SERVICE_ID,builder.build());
 
 
