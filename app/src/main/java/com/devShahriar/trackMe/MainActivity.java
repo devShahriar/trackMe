@@ -51,11 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        try{
-            initiatWebsocket();
-        }catch (Exception e){
-            Log.d("ws :", String.valueOf(e) );
-        }
+
 
         findViewById(R.id.startService).setOnClickListener(new View.OnClickListener() {
             @Override

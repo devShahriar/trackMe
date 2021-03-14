@@ -26,9 +26,24 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+
 
 public class LocationService extends Service {
-
+    private WebSocket webSocket;
+    private String SERVER_PATH = "ws://10.160.52.70:80/ws/sdf";
+    private void initiatWebsocket() {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(SERVER_PATH).build();
+        webSocket = client.newWebSocket(request, new LocationService.SocketListener());
+    }
     public LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -37,7 +52,16 @@ public class LocationService extends Service {
                 double latitude = locationResult.getLastLocation().getLatitude();
                 double longitude = locationResult.getLastLocation().getLongitude();
                 Log.d("Location update", latitude + "," + longitude);
+                JSONObject  data = new JSONObject();
+                try{
 
+                    data.put("latitude", latitude);
+                    data.put("longtitude" , longitude);
+                }catch (JSONException e){
+                    Log.d("JsonException" , e.getMessage());
+                }
+
+                webSocket.send(data.toString());
             }
         }
 
@@ -123,6 +147,7 @@ public class LocationService extends Service {
             if(action!=null){
                 if(action.equals(Constants.ACTION_START_LOCATION_SERVICE)){
                     startLocationService();
+                    initiatWebsocket();
                 }
                 else if(action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)) {
                     stopLocationService();
@@ -132,4 +157,23 @@ public class LocationService extends Service {
         }
         return super.onStartCommand(intent, flags, startId);
     }
+    private class SocketListener extends WebSocketListener {
+
+        @Override
+        public void onOpen(WebSocket webSocket, Response response) {
+            super.onOpen(webSocket, response);
+
+
+
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, String text) {
+            super.onMessage(webSocket, text);
+
+
+
+        }
+    }
+
 }
