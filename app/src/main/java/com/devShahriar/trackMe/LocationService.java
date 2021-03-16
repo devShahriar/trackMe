@@ -10,6 +10,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
@@ -57,6 +58,7 @@ public class LocationService extends Service {
 
                     data.put("latitude", latitude);
                     data.put("longtitude" , longitude);
+
                 }catch (JSONException e){
                     Log.d("JsonException" , e.getMessage());
                 }
@@ -71,11 +73,17 @@ public class LocationService extends Service {
         }
     };
 
+    class LocationServiceBinder extends Binder {
+        public LocationService getService(){
+            return LocationService.this;
+        }
+    }
+    private IBinder mBinder= new LocationServiceBinder();
 
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+       return mBinder;
     }
 
 
@@ -157,13 +165,12 @@ public class LocationService extends Service {
         }
         return super.onStartCommand(intent, flags, startId);
     }
-    private class SocketListener extends WebSocketListener {
 
+
+    private class SocketListener extends WebSocketListener {
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
             super.onOpen(webSocket, response);
-
-
 
         }
 
@@ -175,5 +182,7 @@ public class LocationService extends Service {
 
         }
     }
+    private interface LocationServiceCallback {
 
+    }
 }
