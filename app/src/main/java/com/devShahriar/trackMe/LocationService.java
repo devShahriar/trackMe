@@ -94,6 +94,10 @@ public class LocationService extends Service {
        return mBinder;
     }
 
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
 
     @SuppressLint("MissingPermission")
     private void startLocationService() {
@@ -189,8 +193,8 @@ public class LocationService extends Service {
         @Override
         public void onMessage(WebSocket webSocket, String text) {
             super.onMessage(webSocket, text);
-            if(locationService.activity!=null){
-                activity.readLocation(text);
+           if(locationService.activity!=null){
+               activity.readLocation(text);
             }
             Log.d("message" , text);
         }

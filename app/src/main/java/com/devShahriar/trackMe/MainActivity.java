@@ -29,6 +29,7 @@ import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -40,7 +41,7 @@ import okhttp3.Request;
 public class MainActivity extends AppCompatActivity implements LocationService.LocationServiceCallback  {
 
     private static final int REQUEST_CODE_LOCATION_PERMISSION=1;
-
+    TextView t ;
     private WebSocket webSocket;
     private String SERVER_PATH = "ws://10.160.52.70:80/ws/sdf";
 
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements LocationService.L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        t= (TextView)findViewById(R.id.location);
+
         serviceIntent = new Intent(MainActivity.this , LocationService.class);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -154,45 +157,15 @@ public class MainActivity extends AppCompatActivity implements LocationService.L
         }
     }
 
-    private void initiatWebsocket() {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(SERVER_PATH).build();
-        webSocket = client.newWebSocket(request, new SocketListener());
-    }
+
 
     @Override
     public void readLocation(String text) {
-
+        Log.d("readLocation" , text);
+        t.setText(text);
     }
 
-    private class SocketListener extends WebSocketListener {
 
-        @Override
-        public void onOpen(WebSocket webSocket, Response response) {
-            super.onOpen(webSocket, response);
-
-
-
-        }
-
-        @Override
-        public void onMessage(WebSocket webSocket, String text) {
-            super.onMessage(webSocket, text);
-
-            runOnUiThread(() -> {
-
-                try {
-                    JSONObject jsonObject = new JSONObject(text);
-                    jsonObject.put("isSent", false);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            });
-
-        }
-    }
 
 
 
