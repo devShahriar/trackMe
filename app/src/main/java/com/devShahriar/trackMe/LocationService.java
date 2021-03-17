@@ -1,5 +1,6 @@
 package com.devShahriar.trackMe;
 
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -21,6 +22,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 
+import com.devShahriar.trackMe.Constants;
+import com.devShahriar.trackMe.R;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -40,10 +43,11 @@ import okhttp3.WebSocketListener;
 public class LocationService extends Service {
     private WebSocket webSocket;
     private String SERVER_PATH = "ws://10.160.52.70:80/ws/sdf";
+    public LocationServiceCallback activity;
     private void initiatWebsocket() {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(SERVER_PATH).build();
-        webSocket = client.newWebSocket(request, new LocationService.SocketListener());
+        webSocket = client.newWebSocket(request, new LocationService.SocketListener(LocationService.this));
     }
     public LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -72,6 +76,10 @@ public class LocationService extends Service {
             super.onLocationAvailability(locationAvailability);
         }
     };
+
+    public void registerActivity(LocationServiceCallback activity) {
+        this.activity = (LocationServiceCallback) activity;
+    }
 
     class LocationServiceBinder extends Binder {
         public LocationService getService(){
@@ -168,6 +176,10 @@ public class LocationService extends Service {
 
 
     private class SocketListener extends WebSocketListener {
+        public LocationService locationService;
+        public SocketListener(LocationService locationService){
+            this.locationService = locationService;
+        }
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
             super.onOpen(webSocket, response);
@@ -177,12 +189,13 @@ public class LocationService extends Service {
         @Override
         public void onMessage(WebSocket webSocket, String text) {
             super.onMessage(webSocket, text);
-
-
-
+            if(locationService.activity!=null){
+                activity.readLocation(text);
+            }
+            Log.d("message" , text);
         }
     }
-    private interface LocationServiceCallback {
-
+    public interface LocationServiceCallback {
+            public void readLocation(String text);
     }
 }

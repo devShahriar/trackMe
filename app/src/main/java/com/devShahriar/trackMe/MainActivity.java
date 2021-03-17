@@ -2,8 +2,10 @@ package com.devShahriar.trackMe;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -21,6 +23,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 
@@ -34,19 +37,20 @@ import org.json.JSONObject;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationService.LocationServiceCallback  {
 
     private static final int REQUEST_CODE_LOCATION_PERMISSION=1;
 
     private WebSocket webSocket;
     private String SERVER_PATH = "ws://10.160.52.70:80/ws/sdf";
 
-
-
+   public LocationService locationService;
+   public Intent serviceIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        serviceIntent = new Intent(MainActivity.this , LocationService.class);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -86,6 +90,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            LocationService.LocationServiceBinder binder=
+                    (LocationService.LocationServiceBinder)service;
+            locationService = binder.getService();
+            locationService.registerActivity(MainActivity.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -98,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private boolean isLocationServiceRunning() {
         ActivityManager activityManager =
                 (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
@@ -138,6 +159,12 @@ public class MainActivity extends AppCompatActivity {
         Request request = new Request.Builder().url(SERVER_PATH).build();
         webSocket = client.newWebSocket(request, new SocketListener());
     }
+
+    @Override
+    public void readLocation(String text) {
+
+    }
+
     private class SocketListener extends WebSocketListener {
 
         @Override
