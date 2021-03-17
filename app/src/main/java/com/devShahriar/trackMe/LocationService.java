@@ -43,11 +43,11 @@ import okhttp3.WebSocketListener;
 public class LocationService extends Service {
     private WebSocket webSocket;
     private String SERVER_PATH = "ws://10.160.52.70:80/ws/sdf";
-    public LocationServiceCallback activity;
+    public static LocationServiceCallback activity;
     private void initiatWebsocket() {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(SERVER_PATH).build();
-        webSocket = client.newWebSocket(request, new LocationService.SocketListener(LocationService.this));
+        webSocket = client.newWebSocket(request, new LocationService.SocketListener());
     }
     public LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -78,7 +78,7 @@ public class LocationService extends Service {
     };
 
     public void registerActivity(LocationServiceCallback activity) {
-        this.activity = (LocationServiceCallback) activity;
+        LocationService.activity = (LocationServiceCallback) activity;
     }
 
     class LocationServiceBinder extends Binder {
@@ -181,9 +181,7 @@ public class LocationService extends Service {
 
     private class SocketListener extends WebSocketListener {
         public LocationService locationService;
-        public SocketListener(LocationService locationService){
-            this.locationService = locationService;
-        }
+
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
             super.onOpen(webSocket, response);
@@ -193,9 +191,13 @@ public class LocationService extends Service {
         @Override
         public void onMessage(WebSocket webSocket, String text) {
             super.onMessage(webSocket, text);
-           if(locationService.activity!=null){
+           if(LocationService.activity!=null){
                activity.readLocation(text);
+               Log.d("activitynotnull" , "not null");
             }
+           if(LocationService.activity==null){
+               Log.d("activitynull" , "null");
+           }
             Log.d("message" , text);
         }
     }

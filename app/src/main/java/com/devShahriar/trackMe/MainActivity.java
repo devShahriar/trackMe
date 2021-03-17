@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements LocationService.L
             Intent intent = new Intent(getApplicationContext(),LocationService.class);
             intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
             startService(intent);
+            bindService(intent, mConnection,Context.BIND_AUTO_CREATE); //Binding to the service!
             Toast.makeText(this, "Location service started", Toast.LENGTH_SHORT).show();
         }
     }
