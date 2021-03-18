@@ -1,7 +1,7 @@
 package com.devShahriar.trackMe;
 
 
-import android.Manifest;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -10,7 +10,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -18,12 +18,11 @@ import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
+
 import androidx.core.app.NotificationCompat;
 
 
-import com.devShahriar.trackMe.Constants;
-import com.devShahriar.trackMe.R;
+
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
