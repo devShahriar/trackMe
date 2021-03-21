@@ -10,4 +10,5 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="title_activity_map">Map</string>
+    <string name="mapbox_access_token">pk.eyJ1Ijoic2h1ZGlwIiwiYSI6ImNrZ282bGEybDBkbnQzOG1vbDc4d21tMjUifQ.YX2Fj786oULMXqcvHo8qYw</string>
 </resources>
