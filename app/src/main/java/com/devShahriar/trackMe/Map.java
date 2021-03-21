@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.devShahriar.trackMe;
 
 import android.annotation.SuppressLint;
 import android.icu.text.UnicodeSetIterator;
@@ -97,10 +97,8 @@ public class Map extends AppCompatActivity implements  OnMapReadyCallback{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-// Prevent leaks
-        if (locationEngine != null) {
-            locationEngine.removeLocationUpdates(callback);
-        }
+
+
         mapView.onDestroy();
     }
 
