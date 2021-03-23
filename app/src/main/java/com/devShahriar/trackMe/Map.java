@@ -33,7 +33,7 @@ public class Map extends AppCompatActivity implements  OnMapReadyCallback{
     private MapView mapView;
 
 
-    //  private LocationListeningCallback callback = new LocationListeningCallback(this);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
