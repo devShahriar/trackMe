@@ -58,7 +58,13 @@ public class MainActivity extends AppCompatActivity implements LocationService.L
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-
+       findViewById(R.id.map).setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               Intent map = new Intent(MainActivity.this , Map.class);
+               startActivity(map);
+           }
+       });
 
         findViewById(R.id.startService).setOnClickListener(new View.OnClickListener() {
             @Override
