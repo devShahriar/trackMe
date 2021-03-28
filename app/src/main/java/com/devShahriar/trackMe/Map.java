@@ -59,11 +59,6 @@ public class Map extends AppCompatActivity implements  OnMapReadyCallback{
                 });
     }
 
-
-
-
-
-
     @Override
     protected void onStart() {
         super.onStart();

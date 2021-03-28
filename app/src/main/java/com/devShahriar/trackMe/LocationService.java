@@ -122,6 +122,7 @@ public class LocationService extends Service {
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.d("build version Xiaomi" , String.valueOf(Build.VERSION.SDK_INT));
             if (notificationManager != null
                     && notificationManager.getNotificationChannel(channelId) == null) {
                 NotificationChannel notificationChannel = new NotificationChannel(
