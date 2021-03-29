@@ -151,7 +151,9 @@ public class LocationService extends Service {
         locationRequest.setFastestInterval(2000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            Log.d("LocationServices","it ran");
             LocationServices.getFusedLocationProviderClient(this)
                     .requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 
@@ -159,7 +161,7 @@ public class LocationService extends Service {
 
 
 
-        startForeground(Constants.LOCATION_SERVICE_ID,builder.build(),ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+        startForeground(Constants.LOCATION_SERVICE_ID,builder.build());
 
 
     }
