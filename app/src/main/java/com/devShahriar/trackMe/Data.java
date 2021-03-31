@@ -2,6 +2,18 @@ package com.devShahriar.trackMe;
 
 public class Data {
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public String getLongtitude() {
+        return longtitude;
+    }
+
     private String userId ;
     private String latitude;
     private String longtitude;

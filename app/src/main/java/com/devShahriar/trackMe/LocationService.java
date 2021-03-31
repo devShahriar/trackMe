@@ -1,7 +1,7 @@
 package com.devShahriar.trackMe;
 
 
-
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -11,6 +11,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 
+import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
+import android.location.Location;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -19,8 +22,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-
 
 
 import com.google.android.gms.location.LocationAvailability;
@@ -43,27 +46,34 @@ public class LocationService extends Service {
     private WebSocket webSocket;
     private String SERVER_PATH = "ws://10.160.52.70:80/ws/sdf";
     public static LocationServiceCallback activity;
+
     private void initiatWebsocket() {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(SERVER_PATH).build();
         webSocket = client.newWebSocket(request, new LocationService.SocketListener());
     }
+
     public LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
             super.onLocationResult(locationResult);
+
+
+            Log.d("Location ", String.valueOf(locationResult));
             if (locationResult != null && locationResult.getLastLocation() != null) {
+                Location mLastLocaiton = locationResult.getLastLocation();
+                Log.d("Location ", String.valueOf(mLastLocaiton));
                 double latitude = locationResult.getLastLocation().getLatitude();
                 double longitude = locationResult.getLastLocation().getLongitude();
-                Log.d("Location update", latitude + "," + longitude);
-                JSONObject  data = new JSONObject();
-                try{
+                Log.d("Location_update", latitude + "," + longitude);
+                JSONObject data = new JSONObject();
+                try {
 
                     data.put("latitude", latitude);
-                    data.put("longtitude" , longitude);
+                    data.put("longtitude", longitude);
 
-                }catch (JSONException e){
-                    Log.d("JsonException" , e.getMessage());
+                } catch (JSONException e) {
+                    Log.d("JsonException", e.getMessage());
                 }
 
                 webSocket.send(data.toString());
@@ -81,16 +91,17 @@ public class LocationService extends Service {
     }
 
     class LocationServiceBinder extends Binder {
-        public LocationService getService(){
+        public LocationService getService() {
             return LocationService.this;
         }
     }
-    private IBinder mBinder= new LocationServiceBinder();
+
+    private IBinder mBinder = new LocationServiceBinder();
 
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
-       return mBinder;
+        return mBinder;
     }
 
     @Override
@@ -98,7 +109,7 @@ public class LocationService extends Service {
         return super.onUnbind(intent);
     }
 
-    @SuppressLint("MissingPermission")
+
     private void startLocationService() {
         String channelId = "Location_notification_channel";
         NotificationManager notificationManager =
@@ -120,8 +131,9 @@ public class LocationService extends Service {
         builder.setContentText("Running");
         builder.setAutoCancel(false);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
-
+        Log.d("build version Xiaomi", String.valueOf(Build.VERSION.SDK_INT));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.d("build version Xiaomi", String.valueOf(Build.VERSION.SDK_INT));
             if (notificationManager != null
                     && notificationManager.getNotificationChannel(channelId) == null) {
                 NotificationChannel notificationChannel = new NotificationChannel(
@@ -139,10 +151,14 @@ public class LocationService extends Service {
         locationRequest.setFastestInterval(2000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
+            Log.d("LocationServices","it ran");
+            LocationServices.getFusedLocationProviderClient(this)
+                    .requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 
-        LocationServices.getFusedLocationProviderClient(this)
-                .requestLocationUpdates(locationRequest,locationCallback,Looper.getMainLooper());
+        }
+
 
 
         startForeground(Constants.LOCATION_SERVICE_ID,builder.build());

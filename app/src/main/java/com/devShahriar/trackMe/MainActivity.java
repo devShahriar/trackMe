@@ -58,7 +58,13 @@ public class MainActivity extends AppCompatActivity implements LocationService.L
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-
+       findViewById(R.id.map).setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               Intent map = new Intent(MainActivity.this , Map.class);
+               startActivity(map);
+           }
+       });
 
         findViewById(R.id.startService).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements LocationService.L
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == REQUEST_CODE_LOCATION_PERMISSION){
+        if(requestCode == REQUEST_CODE_LOCATION_PERMISSION && grantResults.length>0){
             if(grantResults[0]==PackageManager.PERMISSION_GRANTED){
                 startLocationService();
             }
