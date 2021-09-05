@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.devShahriar.trackMe">
 
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,9 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FeelSafe"
         android:usesCleartextTraffic="true">
-
         <activity
-            android:name="com.devShahriar.trackMe.MainActivity"
+            android:name=".Map"
+            android:label="@string/title_activity_map"
+            android:theme="@style/Theme.FeelSafe.NoActionBar"></activity>
+        <activity
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.FeelSafe.NoActionBar">
             <intent-filter>
@@ -27,12 +30,12 @@
             </intent-filter>
         </activity>
 
-
         <service
             android:name=".LocationService"
             android:enabled="true"
-            android:exported="false">
-        </service>>
+            android:exported="true"
+            android:foregroundServiceType="location" />
+
     </application>
 
 </manifest>
